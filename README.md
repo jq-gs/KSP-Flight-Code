@@ -1,1 +1,1 @@
-# Gravity-Turn-Flight-Code-1
+print "Experimental Flight Code for KSP"
