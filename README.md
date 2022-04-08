@@ -1,1 +1,1 @@
-print "Experimental Flight Code for KSP"
+Just some experimental flight code for KSP
