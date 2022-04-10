@@ -10,15 +10,18 @@ function main {
 
 
  function doCountdown {
- PRINT "Counting down:".
- FROM {local countdown is 10.} UNTIL countdown = 0 STEP {set countdown to countdown - 1.} DO {
-     PRINT "..." + countdown.
-     WAIT 1.
+ print "Counting down:".
+ from {local countdown is 10.} until countdown = 0 step {set countdown to countdown - 1.} do {
+     print "..." + countdown.
+     wait 1.
+     
+    }
+ print "Liftoff!".
+ RCS on.         
 }
 
 function doLaunch {
-    lock throttle to 1.
-    wait 11.
+    lock throttle to 0.75.
     doSafeStage().
 }
 
@@ -28,18 +31,44 @@ function doLaunch {
  }
 
 function doAscent {
-    lock angle to 8.90244E-8 alt:radar^2 - 0.00535976 * alt:radar + 90.6098.
-    lock steering to heading(90, angle).
+    until apoapsis > 21500 {
+        lock angle to 0.0000000890244 * alt:radar^2 - 0.00535976 * alt:radar + 90.6098.
+        // New Equation -0.00000001 * alt:radar^2 - 0.0032 * alt:radar + 91.5.
+        // Old Equation: 0.0000000890244 * alt:radar^2 - 0.00535976 * alt:radar + 90.6098.
+        if alt:radar < 300 {
+            lock steering to heading(90, 90).
+        } else {
+            lock steering to heading(90, angle).
+        }
+    }   
 }
 
-function doStaging {
-    lock availThrust to ship:availablethrust.
-    until apoapsis > 80000 {
-        if ship:availablethrust < (availThrust - 10).
-        stage. wait 1.
-        set availThrust to ship:availablethrust.
+function doStaging {   
+    until 0 {
+        if apoapsis >= 21500 {
+            print "MECO".
+            global lock throttle to 0.
+            wait 2.
+            print "Stage Separation".
+            stage.
+            wait 7.
+            Boostback ().
+            break.
+        }
     }
 }
+
+function Boostback {
+        print "Boostback Burn Startup".
+        global lock throttle to 1.
+        lock steering to heading(90,0).
+}
+        //set availThrust to ship:availablethrust.
+        // if ship:availablethrust < (availThrust - 10) {
+        // stage. 
+        // wait 1.
+        // } 
+        // set availThrust to ship:availablethrust.
 
 
 
